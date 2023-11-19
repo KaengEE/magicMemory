@@ -90,6 +90,7 @@ function App() {
       {gameOver ? (
         <div>
           <p>성공하셨습니다! 새게임을 원하면 NewGame을 누르세요🎉</p>
+          <p>총 턴수: {turns}</p>
         </div>
       ) : (
         <div>
