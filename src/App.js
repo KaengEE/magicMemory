@@ -3,12 +3,12 @@ import "./App.css";
 import SingleCard from "./component/SingleCard";
 
 const cardImages = [
-  { src: "/img/helmet-1.png" },
-  { src: "/img/potion-1.png" },
-  { src: "/img/ring-1.png" },
-  { src: "/img/scroll-1.png" },
-  { src: "/img/shield-1.png" },
-  { src: "/img/sword-1.png" },
+  { src: "/img/helmet-1.png", matched: false },
+  { src: "/img/potion-1.png", matched: false },
+  { src: "/img/ring-1.png", matched: false },
+  { src: "/img/scroll-1.png", matched: false },
+  { src: "/img/shield-1.png", matched: false },
+  { src: "/img/sword-1.png", matched: false },
 ];
 
 function App() {
@@ -18,6 +18,7 @@ function App() {
 
   const [choiceOne, setChoiceOne] = useState(null); //처음 선택 카드
   const [choiceTwo, setChoiceTwo] = useState(null); //두번째 선택 카드
+  const [disabled, setDisabled] = useState(false); //선택할수없을때 true
 
   //카드섞기
   const shuffleCards = () => {
@@ -27,6 +28,8 @@ function App() {
 
     setCards(shuffledCards);
     setTurns(0); //턴수 0
+    setChoiceOne(null);
+    setChoiceTwo(null);
   };
 
   //카드 선택 기억
@@ -37,12 +40,22 @@ function App() {
   //선택들을 비교하기(useEffect)
   useEffect(() => {
     if (choiceOne && choiceTwo) {
-      if (choiceOne.src === choiceTwo.src) {
-        console.log("카드를 맞췄어요!");
+      setDisabled(true); //다른 선택을 할수없도록
+      if (choiceOne.src === choiceTwo.src && choiceOne.id !== choiceTwo.id) {
+        //같은 이미지의 카드들만 matched를 true로 업데이트함
+        setCards((prevCards) => {
+          return prevCards.map((card) => {
+            if (card.src === choiceOne.src) {
+              return { ...card, matched: true };
+            } else {
+              return card;
+            }
+          });
+        });
         resetTurn();
       } else {
         console.log("틀렸네요.");
-        resetTurn();
+        setTimeout(resetTurn, 1000);
       }
     }
   }, [choiceOne, choiceTwo]);
@@ -51,17 +64,28 @@ function App() {
     setChoiceOne(null);
     setChoiceTwo(null);
     setTurns((prev) => prev + 1);
+    setDisabled(false); //이제 선택가능
   };
 
-  console.log(cards, turns);
+  //처음 시작시 설정
+  useEffect(() => {
+    shuffleCards();
+  }, []);
 
   return (
     <div className="App">
       <h1>Magic Match</h1>
       <button onClick={shuffleCards}>New Game</button>
+      <p>턴수: {turns}</p>
       <div className="card-grid">
         {cards.map((card) => (
-          <SingleCard card={card} handleChoice={handleChoice} key={card.id} />
+          <SingleCard
+            card={card}
+            handleChoice={handleChoice}
+            key={card.id}
+            flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
+          />
         ))}
       </div>
     </div>
