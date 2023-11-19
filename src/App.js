@@ -89,7 +89,7 @@ function App() {
       <h1>Magic Match</h1>
       {gameOver ? (
         <div>
-          <p>성공하셨습니다! 새게임을 원하면 NewGame을 누르세요</p>
+          <p>성공하셨습니다! 새게임을 원하면 NewGame을 누르세요🎉</p>
         </div>
       ) : (
         <div>
