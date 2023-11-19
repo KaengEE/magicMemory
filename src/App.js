@@ -15,12 +15,10 @@ function App() {
   // 카드와 턴수 스테이트 만들기
   const [cards, setCards] = useState([]);
   const [turns, setTurns] = useState(0); // 수정: 배열이 아닌 단일 값으로 변경
-
   const [choiceOne, setChoiceOne] = useState(null); // 처음 선택 카드
   const [choiceTwo, setChoiceTwo] = useState(null); // 두번째 선택 카드
   const [disabled, setDisabled] = useState(false); // 선택할 수 없을 때 true
-
-  const [gameOver, setGameOver] = useState(false); // 게임 종료 상태
+  const [gameOver, setGameOver] = useState(true); // 게임 종료 상태
 
   // 카드 섞기
   const shuffleCards = () => {
@@ -32,8 +30,7 @@ function App() {
     setTurns(0); // 턴수 0
     setChoiceOne(null);
     setChoiceTwo(null);
-    setDisabled(false); // 버튼 활성화
-    setGameOver(false); //게임시작시 false
+    setGameOver(false); // 게임 시작시 false로 설정
   };
 
   // 카드 선택 기억
@@ -41,12 +38,6 @@ function App() {
     // 첫번째 선택이 있으면 두번째에 넣고 없으면 첫번째에 입력
     choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
   }
-
-  // 처음 시작시 설정
-  useEffect(() => {
-    shuffleCards();
-    setGameOver(false);
-  }, []);
 
   // 선택들을 비교하기(useEffect)
   useEffect(() => {
@@ -79,27 +70,36 @@ function App() {
     setDisabled(false); // 이제 선택 가능
   };
 
+  // 처음 시작시 설정
+  useEffect(() => {
+    shuffleCards();
+    setGameOver(false);
+  }, []);
+
   // 카드 전부 맞췄으면 게임 오버
   useEffect(() => {
     const isGameOver = cards.every((card) => card.matched);
-    if (isGameOver) {
+    if (isGameOver && !gameOver) {
       setGameOver(true);
     }
-  }, [cards]);
+  }, [cards, gameOver]);
 
   return (
     <div className="App">
       <h1>Magic Match</h1>
-      {gameOver && (
+      {gameOver ? (
         <div>
-          <p>축하합니다!🎉</p>
-          <p>턴수: {turns}</p>
+          <p>성공하셨습니다! 새게임을 원하면 NewGame을 누르세요</p>
+        </div>
+      ) : (
+        <div>
+          <p>안녕하세요! 👋</p>
         </div>
       )}
-      <button onClick={shuffleCards} disabled={disabled || gameOver}>
-        New Game
-      </button>
+
+      <button onClick={shuffleCards}>New Game</button>
       {!gameOver && <p>턴수: {turns}</p>}
+
       <div className="card-grid">
         {cards.map((card) => (
           <SingleCard
