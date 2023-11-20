@@ -18,7 +18,7 @@ function App() {
   const [choiceOne, setChoiceOne] = useState(null); // 처음 선택 카드
   const [choiceTwo, setChoiceTwo] = useState(null); // 두번째 선택 카드
   const [disabled, setDisabled] = useState(false); // 선택할 수 없을 때 true
-  const [gameOver, setGameOver] = useState(true); // 게임 종료 상태
+  const [gameOver, setGameOver] = useState(false); // 게임 종료 상태
 
   // 카드 섞기
   const shuffleCards = () => {
@@ -41,6 +41,9 @@ function App() {
 
   // 선택들을 비교하기(useEffect)
   useEffect(() => {
+    gameOverCheck(); //상태확인
+    if (gameOver) return; //게임이 끝나면(true) return
+
     if (choiceOne && choiceTwo) {
       setDisabled(true); // 다른 선택을 할 수 없도록
       if (choiceOne.src === choiceTwo.src && choiceOne.id !== choiceTwo.id) {
@@ -76,13 +79,13 @@ function App() {
     setGameOver(false);
   }, []);
 
-  // 카드 전부 맞췄으면 게임 오버
-  useEffect(() => {
-    const isGameOver = cards.every((card) => card.matched);
-    if (isGameOver && !gameOver) {
+  function gameOverCheck() {
+    // 카드 전부 맞췄을때 true
+    const gameOver = cards.every((card) => card.matched);
+    if (gameOver) {
       setGameOver(true);
     }
-  }, [cards, gameOver]);
+  }
 
   return (
     <div className="App">
